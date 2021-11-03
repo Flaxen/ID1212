@@ -11,10 +11,10 @@ public class ChatServer {
     public static void main(String args[]) {
 
         System.out.println("Server starting, awaiting clients..");
-        
+
         ServerClientDistributor scd = new ServerClientDistributor();
         scd.setSelf(scd);
-        
+
         try {
             scd.clientDistributor();
         } catch (Exception e) {
@@ -50,7 +50,7 @@ class ServerClientDistributor {
     ArrayList<Socket> getClients() {
         return clients;
     }
-    
+
     void setSelf(ServerClientDistributor self) {
         this.self = self;
     }
@@ -88,10 +88,17 @@ class ServerClientCommunicator implements Runnable {
 
         int b = fromClient.read();
         while (b != -1) {
-            System.out.print((char) b);
+            if (b == 6) {
+                b = fromClient.read();
+                continue;
+            }
+            //System.out.print((char)b);
             clients = distributor.getClients();
 
             for (int i = 0; i < clients.size(); i++) {
+                if (clients.get(i) == socket || clients.get(i).isClosed()) {
+                    continue;
+                }
                 clients.get(i).getOutputStream().write(b);
             }
 
