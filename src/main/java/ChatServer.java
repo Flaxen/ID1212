@@ -2,43 +2,104 @@
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class ChatServer {
 
+    static ArrayList<Socket> clients = new ArrayList<Socket>();
+
     public static void main(String args[]) {
-        // TODO code application logic here
-        System.out.println("Server starting..\n");
+
+        System.out.println("Server starting, awaiting clients..");
+        
+        ServerClientDistributor scd = new ServerClientDistributor();
+        scd.setSelf(scd);
+        
         try {
-            doStuff();
+            scd.clientDistributor();
         } catch (Exception e) {
-            System.out.println("Something wrong 1 \n" + e);
+            System.out.println("Something wrong 1: \n" + e);
         }
         System.out.println("Server shutting down..");
 
-
     }
+}
 
-    private static void doStuff() throws Exception {
+class ServerClientDistributor {
 
+    private static ArrayList<Socket> clients = new ArrayList<Socket>();
+    private static ServerClientDistributor self;
+
+    public static void clientDistributor() throws Exception {
         ServerSocket socket = new ServerSocket(1337);
-        Socket session;
+        Socket client;
+        ServerClientCommunicator scc;
+        Thread thread;
 
+        int i = 0;
         while (true) {
-            session = socket.accept();
+            client = socket.accept();
 
-            InputStream fromClient = session.getInputStream();
-
-            System.out.println("Server got message:");
-            int b = fromClient.read();
-            while (b != -1) {
-                System.out.print((char)b);
-                
-                b = fromClient.read();
-            }
-            System.out.println("\nEnd of server message");
-
-            session.close();
+            clients.add(client);
+            scc = new ServerClientCommunicator(client, i++, self);
+            thread = new Thread(scc);
+            thread.start();
         }
-        //socket.close();
     }
+
+    ArrayList<Socket> getClients() {
+        return clients;
+    }
+    
+    void setSelf(ServerClientDistributor self) {
+        this.self = self;
+    }
+}
+
+class ServerClientCommunicator implements Runnable {
+
+    ServerClientDistributor distributor;
+    Socket socket;
+    int id;
+
+    ServerClientCommunicator(Socket socket, int id, ServerClientDistributor distributor) {
+        this.socket = socket;
+        this.id = id;
+        this.distributor = distributor;
+    }
+
+    @Override
+    public void run() {
+
+        System.out.println("Runnable starting with id: " + id);
+        try {
+            doStuff();
+        } catch (Exception e) {
+            System.out.println("Something wrong 2 \n" + e);
+        }
+        System.out.println("Runnable shutting down with id:" + id);
+
+    }
+
+    private void doStuff() throws Exception {
+
+        InputStream fromClient = socket.getInputStream();
+        ArrayList<Socket> clients;
+
+        int b = fromClient.read();
+        while (b != -1) {
+            System.out.print((char) b);
+            clients = distributor.getClients();
+
+            for (int i = 0; i < clients.size(); i++) {
+                clients.get(i).getOutputStream().write(b);
+            }
+
+            b = fromClient.read();
+        }
+
+        socket.close();
+
+    }
+
 }
