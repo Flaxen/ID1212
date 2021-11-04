@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 public class ChatServer {
 
-    static ArrayList<Socket> clients = new ArrayList<Socket>();
-
     public static void main(String args[]) {
 
         System.out.println("Server starting, awaiting clients..");

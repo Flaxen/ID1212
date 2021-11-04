@@ -14,7 +14,7 @@ class ChatClient {
         } catch (Exception e) {
             System.out.println("Something wrong:\n" + e);
         }
-        
+
         ChatClientMonitor ccm = new ChatClientMonitor(socket);
         Thread thread = new Thread(ccm);
         thread.start();
@@ -46,7 +46,6 @@ class ChatClient {
 
         }
     }
-
 }
 
 class ChatClientMessageReceiver implements Runnable {
@@ -92,11 +91,11 @@ class ChatClientMonitor implements Runnable {
 
         try {
             OutputStream toServer = socket.getOutputStream();
-            while(true) {
+            while (true) {
                 toServer.write(6);
                 Thread.sleep(1000);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Server connection lost\n");
         }
     }
