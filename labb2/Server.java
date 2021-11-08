@@ -53,12 +53,32 @@ public class Server implements Runnable {
     Handler handler = new Handler();
 
     String request = reader.readLine();
-    String response = handler.generateResponse(request);
+    String test = reader.readLine();
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+    test += ("\n" + reader.readLine());
+
+    String response = handler.generateResponse(request + "\n" + test);
 
     writer.print(response);
     writer.flush();
-
     System.out.println("sending: \n" + response);
+
+
   }
 
 

@@ -8,6 +8,7 @@ erl_crash.dump
 *.zip
 *.png
 *.class
+*.html
 
 # rebar 2.x
 .rebar
