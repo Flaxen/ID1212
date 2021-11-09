@@ -40,7 +40,6 @@ public class Server implements Runnable {
   public void run() {
     System.out.println("Thread started, handling client");
 
-
     try {
       serveClient();
     } catch(Exception e) {
@@ -50,32 +49,25 @@ public class Server implements Runnable {
 
   private void serveClient() throws Exception {
     Guess game = new Guess();
-    Handler handler = new Handler();
+    Handler handler = new Handler(reader);
 
-    String request = reader.readLine();
-    String test = reader.readLine();
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
-    test += ("\n" + reader.readLine());
+    String temp = reader.readLine();
 
-    String response = handler.generateResponse(request + "\n" + test);
+    String response = handler.generateResponse(temp);
 
     writer.print(response);
     writer.flush();
+
+    Thread.sleep(100);
+    String line = reader.readLine();
+    while(line != null) {
+      Thread.sleep(10);
+      System.out.println("Found line: " + line);
+      line = reader.readLine();
+    }
+    line = reader.readLine();
+    System.out.println("After ctlr: " + line);
+
     System.out.println("sending: \n" + response);
 
 

@@ -1,7 +1,10 @@
 
 import java.time.LocalDateTime;
+import java.io.BufferedReader;
 
 class Handler {
+
+  private BufferedReader reader;
 
   private static final String HTTP_OK = "HTTP/1.1 200 OK";
   private static final String HTTP_NOT_FOUND = "HTTP/1.1 404 File Not Found";
@@ -14,8 +17,11 @@ class Handler {
   // private static final String GAME_ANSWER_IS_LOWER_HTML
   // private static final String GAME_CORRECT_HTML
 
+  Handler(BufferedReader reader) {
+    this.reader = reader;
+  }
 
-  public String generateResponse(String request) {
+  public String generateResponse(String request) throws Exception {
     System.out.println(request);
 
     String[] requestArr = request.split(" ");
@@ -42,8 +48,9 @@ class Handler {
     }
   }
 
-  String postRequest(String resource, String version) {
-    return "";
+  String postRequest(String resource, String version) throws Exception {
+
+    return HTTP_OK + "\nDate: " + LocalDateTime.now() + "\nContent-length: " + GAME_LANDING_HTML.length() + "\nContent-type: text/html\r\n\r\n" + GAME_LANDING_HTML;
   }
 
   String otherRequest() {
