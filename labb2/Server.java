@@ -34,6 +34,7 @@ public class Server implements Runnable {
     } catch(Exception e) {
       System.out.println("Exceptions: \n" + e);
     }
+
   }
 
   @Override
@@ -53,21 +54,10 @@ public class Server implements Runnable {
 
     String temp = reader.readLine();
 
-    String response = handler.generateResponse(temp);
+    String response = handler.generateResponse(game, temp);
 
     writer.print(response);
     writer.flush();
-
-    Thread.sleep(100);
-    String line = reader.readLine();
-    while(line != null) {
-      Thread.sleep(10);
-      System.out.println("Found line: " + line);
-      line = reader.readLine();
-    }
-    line = reader.readLine();
-    System.out.println("After ctlr: " + line);
-
     System.out.println("sending: \n" + response);
 
 
