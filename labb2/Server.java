@@ -18,20 +18,20 @@ public class Server {
 
       while(true) {
 
-        System.out.println("Awaiting message..");
+        System.out.println("=============== Awaiting message ===============");
         session = socket.accept();
 
         reader = new BufferedReader(new InputStreamReader(session.getInputStream()));
         handler.setReader(reader);
         writer = new PrintWriter(session.getOutputStream());
 
-        System.out.println("Got message!");
+        System.out.println("\nREQUEST:");
 
         String response = handler.generateResponse();
 
         writer.print(response);
         writer.flush();
-        System.out.println("sending: \n" + response);
+        System.out.println("\nRESPONSE:" + response);
       }
     } catch(Exception e) {
       System.out.println("Exceptions: \n" + e);

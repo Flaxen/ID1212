@@ -13,9 +13,14 @@ class Handler {
   private static final String HTTP_NOT_IMPL_RESPONSE = "501 not implemented";
 
   private static final String GAME_LANDING_HTML = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>Welcome to number guessing game!<br>I have number between 1 and 100.<br>Whats your guess:<form method='POST'><input type='text' name='guess'><input type='submit' value='Submit'></form></body></html>";
-  private static final String GAME_ANSWER_IS_LARGER_HTML = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>Number is larger!<br>Whats your guess:<form method='POST'><input type='text' name='guess'><input type='submit' value='Submit'></form></body></html>";
-  private static final String GAME_ANSWER_IS_LOWER_HTML = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>Number is smaller!<br>Whats your guess:<form method='POST'><input type='text' name='guess'><input type='submit' value='Submit'></form></body></html>";
-  private static final String GAME_CORRECT_HTML = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>You got it!<br>Play again?<form method='POST'><input type='submit' name='play' value='Play Again!'></form></body></html>";
+  private static final String GAME_ANSWER_IS_LARGER_HTML1 = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>Number is larger! You have made ";
+  private static final String GAME_ANSWER_IS_LARGER_HTML2 = " guess(es)<br>Whats your guess:<form method='POST'><input type='text' name='guess'><input type='submit' value='Submit'></form></body></html>";
+
+  private static final String GAME_ANSWER_IS_LOWER_HTML1 = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>Number is smaller! You have made ";
+  private static final String GAME_ANSWER_IS_LOWER_HTML2 = " guess(es)<br>Whats your guess:<form method='POST'><input type='text' name='guess'><input type='submit' value='Submit'></form></body></html>";
+
+  private static final String GAME_CORRECT_HTML1 = "<!DOCTYPE html><html lang='en' dir='ltr'><head><meta charset='utf-8'><title></title></head><body>You got it! You made it in ";
+  private static final String GAME_CORRECT_HTML2 = " guess(es)!<br>Play again?<form method='POST'><input type='submit' name='play' value='Play Again!'></form></body></html>";
 
   private BufferedReader reader;
   private ArrayList<Guess> games =  new ArrayList<Guess>();
@@ -27,6 +32,9 @@ class Handler {
     this.reader = reader;
   }
 
+  // returns all remaining rows of a request.
+  // starts at current reader buffer.
+  // if no content-length is found no body is assumed to be attached
   private String getFullRequest() throws Exception {
 
     StringBuilder sb = new StringBuilder();
@@ -34,7 +42,6 @@ class Handler {
     // get header
     String temp = reader.readLine();
     while(!temp.equals("")) {
-      // System.out.println(temp);
       sb.append(temp + "\n");
       temp = reader.readLine();
     }
@@ -55,12 +62,13 @@ class Handler {
     return sb.toString();
   }
 
+  // iterates through rows in headers and looks for row beginning with headerName.
+  // return entire row beginning with headerName
   private String getHeaderPiece(String headers, String headerName) {
     headerName = headerName.toLowerCase();
     String[] headerArr = headers.split("\n");
 
     for(int i = 0; i < headerArr.length; i++) {
-      // System.out.println("ID " + i + "header: " + headerArr[i]);
       if(headerArr[i].toLowerCase().startsWith(headerName)) {
         return headerArr[i];
       }
@@ -80,6 +88,10 @@ class Handler {
     return Integer.parseInt(cookieHeader.split("=")[1]);
   }
 
+  // looks for cookie in request headers.
+  // if no cookie is found a new game instance is created and connected to a cookie and attatched cookie is returned with http protocol parts
+  // if cookie is found "" is returned.
+  // return value is ready http header for attatchment as part of larger http ok header or other.
   private String cookieCheck(String headers) {
     String cookieResultPart;
 
@@ -95,6 +107,7 @@ class Handler {
     return cookieResultPart;
   }
 
+  // iterates through arraylist of games and returnes index of game with provided cookie or -1 if no such game is found
   private int getGameIndex(int cookie) {
 
     for(int i = 0; i < games.size(); i++) {
@@ -105,6 +118,7 @@ class Handler {
     return -1;
   }
 
+  // switch case for filtering request types. reads first row of a request. returns string to be sent to browser
   public String generateResponse() throws Exception {
     String requestLine = reader.readLine();
     System.out.println(requestLine);
@@ -113,21 +127,21 @@ class Handler {
 
     switch (requestArr[0]) {
       case "GET":
-        return getRequest(requestArr[1], requestArr[2]);
+        return getRequest(requestArr[1]);
 
       case "POST":
-        return postRequest(requestArr[1], requestArr[2]);
-      //
-      // default:
-      //   return otherRequest();
+        return postRequest();
+
+      default:
+        return otherRequest();
     }
-    return "";
   }
 
-
-  String getRequest(String resource, String version) throws Exception {
+  // returns a http 200 or 404 response based on requested resource
+  // if no cookie is present on a request which will result in a 200 response, a new cookie is added.
+  String getRequest(String resource) throws Exception {
     String headers = getFullRequest();
-    // System.out.println(headers);
+    System.out.println(headers);
 
     String cookieResultPart = cookieCheck(headers);
 
@@ -139,10 +153,12 @@ class Handler {
     }
   }
 
-  String postRequest(String resource, String version) throws Exception {
+  // returns http 200 response with new web content based on game logic
+  // crates new game instance and sets new cookie if client wishes to play again
+  String postRequest() throws Exception {
 
     String rest = getFullRequest();
-    // System.out.println(rest);
+    System.out.println(rest);
 
     if(getHeaderPiece(rest, "content-length") == null) {
       return HTTP_OK + "\nDate: " + LocalDateTime.now() + "\nContent-length: " + "error empty post".length() + "\nContent-type: text/html\r\n\r\n" + "error empty post";
@@ -156,6 +172,7 @@ class Handler {
     String[] requestRows = rest.split("\n");
     String postBody = requestRows[requestRows.length-1];
 
+    // post body is a request to play again
     if(postBody.startsWith("play")) {
 
       int cookie = Integer.parseInt(cookieHeader.split("=")[1]);
@@ -170,41 +187,35 @@ class Handler {
       return HTTP_OK + "\nDate: " + LocalDateTime.now() + cookieResultPart + "\nContent-length: " + GAME_LANDING_HTML.length() + "\nContent-type: text/html\r\n\r\n" + GAME_LANDING_HTML;
     }
 
+    // post body is a guess
     int cookie = Integer.parseInt(cookieHeader.split("=")[1]);
     int gameIndex = getGameIndex(cookie);
-
     Guess currentGame = games.get(gameIndex);
-
-    for(int i = 0; i < games.size(); i++) {
-      System.out.println("==== answer " + i + " " + games.get(i).getAnswer());
-    }
-
     int res = currentGame.guess(Integer.parseInt(postBody.split("=")[1]));
 
     String resString = "game error";
 
     switch(res) {
       case 0:
-        resString = GAME_CORRECT_HTML;
+        resString = GAME_CORRECT_HTML1 + currentGame.getGuesses() + GAME_CORRECT_HTML2;
         break;
       case 1:
-        resString = GAME_ANSWER_IS_LARGER_HTML;
+        resString = GAME_ANSWER_IS_LARGER_HTML1 + currentGame.getGuesses() + GAME_ANSWER_IS_LARGER_HTML2;
         break;
       case 2:
-        resString = GAME_ANSWER_IS_LOWER_HTML;
+        resString = GAME_ANSWER_IS_LOWER_HTML1 + currentGame.getGuesses() + GAME_ANSWER_IS_LOWER_HTML2;
         break;
       default:
         System.out.println("should not get here");
     }
     return HTTP_OK + "\nDate: " + LocalDateTime.now() + "\nContent-length: " + resString.length() + "\nContent-type: text/html\r\n\r\n" + resString;
-    // return null;
   }
-  //
-  // String otherRequest() {
-  //   return HTTP_NOT_IMPL + "\r\nDate: " + LocalDateTime.now() + "\r\nContent-Length: " +
-  //          HTTP_NOT_IMPL_RESPONSE.length() + "\r\nContent-type: text/html\r\n\r\n" + HTTP_NOT_IMPL_RESPONSE;
-  //
-  // }
+
+  // returns http response 501 if request type other than get or post is received
+  String otherRequest() {
+    return HTTP_NOT_IMPL + "\r\nDate: " + LocalDateTime.now() + "\r\nContent-Length: " +
+           HTTP_NOT_IMPL_RESPONSE.length() + "\r\nContent-type: text/html\r\n\r\n" + HTTP_NOT_IMPL_RESPONSE;
+  }
 
 
 
