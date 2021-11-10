@@ -1,42 +1,72 @@
 
 import java.util.Scanner;
-import java.util.Random;
 
 public class Guess {
-  private static int answer = new Random().nextInt(100) + 1; // range [0, 100). this row gives [1, 101) = [1, 100]
+  private int answer;
 
-    public static void main(String[] args) {
-        int guess = 0;                              // 0 is not in answer range. works as init
+  private int cookieId;
+  private int latestState;
+  private int guesses = 0;
 
-        Scanner in = new Scanner(System.in);
-        System.out.println("Guess game!");
+  Guess(int cookieId) {
+    this.cookieId = cookieId;
+    this.answer = answer;
+    // System.out.println("================== new random is: " + answer);
 
-        while (true) {
-            System.out.print("Guess plz: ");
-            guess = in.nextInt();
+  }
 
-            if (guess == answer) {
-                System.out.println("You got it!");
-                break;
-            } else if (guess < answer) {
-                System.out.println("Answer i larger!");
+  public void setAnswer(int answer) {
+    this.answer = answer;
+  }
 
-            } else {
-                System.out.println("Answer is smaller!");
+  public int getGuesses() {
+    return guesses;
+  }
 
-            }
-        }
-    }
+  public int getAnswer() {
+    return answer;
+  }
+
+  public int getCookieId() {
+    return cookieId;
+  }
+
+  // public static void main(String[] args) {
+  //     int guess = 0;                              // 0 is not in answer range. works as init
+  //
+  //     Scanner in = new Scanner(System.in);
+  //     System.out.println("Guess game!");
+  //
+  //     while (true) {
+  //         System.out.print("Guess plz: ");
+  //         guess = in.nextInt();
+  //
+  //         if (guess == answer) {
+  //             System.out.println("You got it!");
+  //             break;
+  //         } else if (guess < answer) {
+  //             System.out.println("Answer i larger!");
+  //
+  //         } else {
+  //             System.out.println("Answer is smaller!");
+  //
+  //         }
+  //     }
+  // }
 
     // return meanings:
     // 0 = correct, 1 = answer is larger, 2 = answer is smaller
     public int guess(int guess) {
+      guesses++;
+
       if(guess == answer) {
-        return 0;
+        latestState = 0;
       } else if(guess < answer) {
-        return 1;
+        latestState = 1;
       } else {
-        return 2;
+        latestState = 2;
       }
+
+      return latestState;
     }
 }
