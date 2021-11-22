@@ -1,6 +1,6 @@
 <%-- 
     Document   : index
-    Created on : 22-Nov-2021, 15:40:13
+    Created on : 19-Nov-2021, 14:46:38
     Author     : Flaxen
 --%>
 
@@ -12,6 +12,12 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>Entry Form!</h1>
+        <form name="Name Input Form" action="response.jsp">
+            Enter your name:
+            <input type="text" name="name" />
+            <input type="submit" value="OK" />
+
+        </form>
     </body>
 </html>
