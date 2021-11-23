@@ -9,6 +9,8 @@ erl_crash.dump
 *.png
 *.class
 *.html
+*.jar
+apache-tomcat-9.0.40/
 
 # rebar 2.x
 .rebar
@@ -20,3 +22,5 @@ deps
 .rebar3
 _build/
 _checkouts/
+/labb3/nbproject/private/
+/labb3/build/
