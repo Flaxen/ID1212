@@ -22,6 +22,7 @@ public class DBServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("in get");
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("Connecting to DB. <br>");
@@ -42,7 +43,6 @@ public class DBServlet extends HttpServlet {
 //            response.setContentType("text/html;charset=UTF-8");
             RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
             rd.forward(request, response);
-            System.out.println("in get");
 
         } catch (Exception e) {
             out.println(e.getMessage());
@@ -52,6 +52,7 @@ public class DBServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("in post");
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("Connecting to DB. <br>");
@@ -62,7 +63,6 @@ public class DBServlet extends HttpServlet {
             DataSource ds = (DataSource) envContext.lookup("jdbc/mysql");
             Connection conn = ds.getConnection();
 
-            System.out.println("in post");
             RequestDispatcher rd;
             
             if(request.getParameter("login") != null) {

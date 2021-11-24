@@ -36,13 +36,13 @@ public class NameHandler {
      * @return the userID
      */
     public String getUserID() {
-        return userID;
+        return this.userID = userID + ", id fetched from db using java";
     }
 
     /**
      * @param userID the userID to set
      */
     public void setUserID(String userID) {
-        this.userID = userID + " asd";
+        this.userID = userID;
     }
 }

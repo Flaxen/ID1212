@@ -20,6 +20,6 @@
         <jsp:useBean id="mybean" scope="session" class="test.NameHandler" />
         <% mybean.setUserID(request.getAttribute("userID").toString()); %>
         <!--jsp:setProperty name="mybean" property="userID" value=""/-->
-        <h1>Hello, <jsp:getProperty name="mybean" property="userID" />!</h1>
+        <h1>Hello user <jsp:getProperty name="mybean" property="userID" />!</h1>
     </body>
 </html>
