@@ -17,9 +17,17 @@
         </form>
         
 
-        <jsp:useBean id="mybean" scope="session" class="test.NameHandler" />
+        <jsp:useBean id="mybean" scope="session" class="test.User" />
         <% mybean.setUserID(request.getAttribute("userID").toString()); %>
         <!--jsp:setProperty name="mybean" property="userID" value=""/-->
         <h1>Hello user <jsp:getProperty name="mybean" property="userID" />!</h1>
+        <br>
+        Your results for quiz 1 is <jsp:getProperty name="mybean" property="quiz" />
+        
+        
+        
+        <form name="temp" method="POST">
+            <input type="submit" value="temp" name="temp" />
+        </form>
     </body>
 </html>
