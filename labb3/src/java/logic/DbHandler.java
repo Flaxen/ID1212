@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -61,6 +62,7 @@ public class DbHandler {
 
             int i = 0;
             while (rs.next()) {
+                System.out.println("whiler1 wowowo");
                 User tempUser = new User();
 
                 tempUser.setUsername(rs.getString("username"));
@@ -114,8 +116,10 @@ public class DbHandler {
 
             int i = 0;
             while (rs.next()) {
+                System.out.println("whiler2 wowowo");
+
                 Quiz temp = new Quiz();
-                
+
                 temp.setId(rs.getInt("id"));
                 temp.setSubject(rs.getString("subject"));
 
@@ -128,30 +132,32 @@ public class DbHandler {
 
         return quizzes;
     }
-    
+
     public Question[] getQuestions(int quizId) {
-        
+
         Question[] questions = null;
         try {
-            String sql = "SELECT COUNT(*) FROM questions\n" +
-                            "INNER JOIN\n" +
-                            "selector ON questions.id = selector.question_id\n" + 
-                            "WHERE quiz_id = " + quizId;
+            String sql = "SELECT COUNT(*) FROM questions\n"
+                    + "INNER JOIN\n"
+                    + "selector ON questions.id = selector.question_id\n"
+                    + "WHERE quiz_id = " + quizId;
             ResultSet rs = stmt.executeQuery(sql);
 
             rs.next();
             questions = new Question[rs.getInt(1)];
             //System.out.println(users.length);
-            sql = "SELECT * FROM questions\n" +
-                        "INNER JOIN\n" +
-                        "selector ON questions.id = selector.question_id\n" +
-                        "WHERE quiz_id = " + quizId;
+            sql = "SELECT * FROM questions\n"
+                    + "INNER JOIN\n"
+                    + "selector ON questions.id = selector.question_id\n"
+                    + "WHERE quiz_id = " + quizId;
             rs = stmt.executeQuery(sql);
 
             int i = 0;
             while (rs.next()) {
+                System.out.println("whiler3 wowowo");
+
                 Question temp = new Question();
-                
+
                 temp.setText(rs.getString("text"));
                 temp.setOptions(rs.getString("options"));
                 temp.setAnswer(rs.getString("answer"));
@@ -164,5 +170,89 @@ public class DbHandler {
         }
 
         return questions;
+    }
+
+    public void validateQuiz(HttpServletRequest request, HttpSession session) {
+        System.out.println(request.getParameter("question0box0"));
+        Question[] questions = (Question[]) session.getAttribute("questions");
+
+        int score = 0;
+
+        for (int i = 0; i < questions.length; i++) {
+            String[] answers = questions[i].getAnswer();
+            for (int j = 0; j < answers.length; j++) {
+                if ("ON".equals(request.getParameter("question" + i + "box" + j)) && answers[j].equals("1")) {
+                    //System.out.println("added score");
+                    score++;
+                } else {
+                    //System.out.println("wrong");
+                }
+            }
+        }
+        updateScore((User) session.getAttribute("user"), score, (int) session.getAttribute("quizname"), (int) session.getAttribute("quizId"));
+    }
+
+    private void updateScore(User u, int score, int quizId, int qid) {
+        try {
+
+            String sql = "SELECT id FROM users WHERE username='" + u.getUsername() + "'";
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            int userId = rs.getInt("id");
+
+            sql = "SELECT COUNT(*) FROM results WHERE user_id='" + userId + "' AND quiz_id='" + qid + "'";
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                sql = "INSERT INTO results(user_id, quiz_id, score) VALUES(" + userId + "," + qid + "," + score + ")";
+                System.out.println("inserting new res");
+                stmt.executeUpdate(sql);
+
+            } else {
+                sql = "UPDATE results SET score=" + score + " WHERE user_id='" + userId + "' AND quiz_id='" + qid + "'";
+                System.out.println("updating res");
+                stmt.executeUpdate(sql);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("eroeroeroe updateScore " + e);
+        }
+    }
+
+    public Result[] getLatestResult(User u) {
+        Result[] results = null;
+        try {
+
+            String sql = "SELECT id FROM users WHERE username='" + u.getUsername() + "'";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            rs.next();
+            int userId = rs.getInt("id");
+
+            sql = "SELECT COUNT(*) FROM quizzes";
+            rs = stmt.executeQuery(sql);
+
+            rs.next();
+            results = new Result[rs.getInt(1)];
+
+            sql = "SELECT * FROM results WHERE user_id=" + userId + " ORDER BY quiz_id";
+            rs = stmt.executeQuery(sql);
+            int i = 0;
+            while (rs.next()) {
+                System.out.println("whiler4 wowowo");
+
+                Result temp = new Result();
+                temp.setQuizId(rs.getInt("quiz_id"));
+                temp.setScore(rs.getInt("score"));
+
+                results[i++] = temp;
+            }
+
+        } catch (Exception e) {
+            System.out.println("brbrbr bestres " + e);
+        }
+
+        return results;
     }
 }

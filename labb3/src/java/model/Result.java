@@ -11,21 +11,21 @@ package model;
  */
 public class Result {
     
-    private int id;
+    private int quizId;
     private int score;
 
     /**
      * @return the id
      */
-    public int getId() {
-        return id;
+    public int getQuizId() {
+        return quizId;
     }
 
     /**
-     * @param id the id to set
+     * @param quizId the id to set
      */
-    public void setId(int id) {
-        this.id = id;
+    public void setQuizId(int quizId) {
+        this.quizId = quizId;
     }
 
     /**

@@ -38,8 +38,18 @@
         <br> Available quizzes: <br><br>
             <%
                 Quiz[] quizzes = (Quiz[])application.getAttribute("quizzes");
+                Result[] cast = (Result[])session.getAttribute("userresults");
+                int i = 0;
                 for (Quiz q : quizzes) {    
                     out.println(q.getSubject());
+                    Result res = cast[i++];
+                    if(res == null || res.getQuizId() != q.getId()) {
+                        out.println("| Score: 0");
+                        i--;
+                    } else {
+                        out.println("| Score: " + res.getScore());
+                    }
+
 
             %>
        

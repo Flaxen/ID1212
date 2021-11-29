@@ -28,9 +28,9 @@
             
         <%
             String[] options = questions[i].getOptions();
-                for(String option : options) {
+                for(int j = 0; j < options.length; j++) {
         %>
-            <input type="checkbox" name="answer" value="ON" /> <%= option %>  <br>
+        <input type="checkbox" name=<%="question"+i+"box"+j%> value="ON" /> <%= options[j] %>  <br>
             
         <%      
                 }
@@ -39,8 +39,8 @@
         %>
         
         
-
-            <input type="submit" value="submit" name="submit" />
+            <input type="hidden" name="action" value="submitquiz"/>
+            <input type="submit" value="Submit" />
         </form>
     </body>
 </html>

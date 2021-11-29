@@ -78,7 +78,8 @@ public class Controller extends HttpServlet {
 
                 Quiz[] quizzes = dbh.getQuizzes();
                 application.setAttribute("quizzes", quizzes);
-
+                
+                session.setAttribute("userresults", dbh.getLatestResult(u));
                 RequestDispatcher rd = request.getRequestDispatcher("/home.jsp");
                 rd.forward(request, response);
             } else {
@@ -91,6 +92,7 @@ public class Controller extends HttpServlet {
 
         } else if ("logout".equals(request.getParameter("action"))) {
             //request.setAttribute("loginState", "false");
+            System.out.println("logout ongoing pog");
             session.invalidate();
             RequestDispatcher rd = request.getRequestDispatcher("/index.jsp");
             rd.forward(request, response);
@@ -99,10 +101,17 @@ public class Controller extends HttpServlet {
                 .startsWith("takequiz:")) {
             int qid = Integer.parseInt(request.getParameter("action").split(":")[1]);
             Question[] questions = dbh.getQuestions(qid);
+            session.setAttribute("quizId", qid);
 
             session.setAttribute("quizname", qid);
             session.setAttribute("questions", questions);
             RequestDispatcher rd = request.getRequestDispatcher("/quiz.jsp");
+            rd.forward(request, response);
+        } else if ("submitquiz".equals(request.getParameter("action"))) {
+            dbh.validateQuiz(request, session);
+            
+            session.setAttribute("userresults", dbh.getLatestResult(u));
+            RequestDispatcher rd = request.getRequestDispatcher("/home.jsp");
             rd.forward(request, response);
         } else {
             out.println("post request error, unknown action<br>");
