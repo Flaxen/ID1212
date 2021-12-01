@@ -11,6 +11,8 @@ erl_crash.dump
 *.html
 *.jar
 apache-tomcat-9.0.40/
+password.txt
+username.txt
 
 # rebar 2.x
 .rebar
@@ -24,4 +26,3 @@ _build/
 _checkouts/
 /labb3/nbproject/private/
 /labb3/build/
-
