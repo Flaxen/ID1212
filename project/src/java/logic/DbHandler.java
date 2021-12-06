@@ -141,6 +141,27 @@ public class DbHandler {
         return rooms;
     }
     
+    public Room getRoom(int roomId) {
+        
+        Room room = new Room();
+        try {
+            
+            String sql = "SELECT * FROM rooms WHERE id=" + roomId;
+            ResultSet rs = stmt.executeQuery(sql);
+            rs.next();
+            
+            room.setId(roomId);
+            room.setName(rs.getString("name"));
+            room.setCourseCode(rs.getString("course_code"));
+            room.setLength(rs.getInt("length"));
+            
+        } catch(Exception e) {
+            System.out.println("getRoom " + e);
+        }
+        
+        return room;
+    }
+    
     public int userInQueue(User u, int queueId) {
         int inQ = 0;
         try {

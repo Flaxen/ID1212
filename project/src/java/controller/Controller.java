@@ -108,7 +108,9 @@ public class Controller extends HttpServlet {
             Queue[] queue = dbh.getQueue(qid);
             String role = dbh.getRole(u, qid);
             int userInQueue = dbh.userInQueue(u, qid);
+            Room room = dbh.getRoom(qid);
             
+            session.setAttribute("room", room);
             session.setAttribute("userInQueue", userInQueue);
             session.setAttribute("role", role);
             session.setAttribute("queue", queue);

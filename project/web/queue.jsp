@@ -30,8 +30,10 @@
 
 
         </div>
-
-        <h1>Queue page!</h1>
+        <%
+        Room room = (Room)session.getAttribute("room");
+        %>
+        <h1><%=room.getCourseCode()%> <%=room.getName()%></h1>
         <div style="width:50%; float:left">
             <table border="1">
                 <thead>
